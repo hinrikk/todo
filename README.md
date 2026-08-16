@@ -30,3 +30,16 @@ docker run --name postgres \
 
 ### Connect to Database
 psql -h localhost -p 5432 -U admin -d tododb
+
+
+
+
+# Start on cluster
+
+## Build Api on Minikube Docker
+In /api:
+eval $(minikube docker-env)
+docker build -t todo-api .
+
+kubectl rollout restart deployment todo-api
+
