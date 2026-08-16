@@ -1,0 +1,13 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: todo-db-init
+spec:
+  template:
+    spec:
+      containers:
+        - name: db-init
+          image: todo-api
+          imagePullPolicy: Never
+          command: ["node", "db-init.js"]
+      restartPolicy: OnFailure
