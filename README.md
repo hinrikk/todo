@@ -34,3 +34,6 @@ user
 user
 
 ssh user@192.168.64.4
+
+
+# Build Docker Image

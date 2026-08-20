@@ -14,10 +14,16 @@ spec:
     spec:
       containers:
         - name: todo-api
-          image: todo-api
-          imagePullPolicy: Never
+          image: hinrikk/todo-api:latest
           ports:
             - containerPort: 3000
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
 
 ---
 apiVersion: v1

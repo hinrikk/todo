@@ -29,6 +29,13 @@ spec:
           image: postgres:18
           ports:
             - containerPort: 5432
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "256Mi"
+            limits:
+              cpu: "1"
+              memory: "1Gi"
           env:
             - name: POSTGRES_USER
               value: admin
