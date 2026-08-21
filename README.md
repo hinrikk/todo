@@ -29,11 +29,4 @@ minikube service todo-api-service --url
 ### Get Logs
 kubectl logs deployment/todo-api
 
-# Test Server
-user
-user
-
-ssh user@192.168.64.4
-
-
 # Build Docker Image
