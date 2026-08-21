@@ -30,3 +30,9 @@ minikube service todo-api-service --url
 kubectl logs deployment/todo-api
 
 # Build Docker Image
+
+# GitHub
+
+## Start Runner on Mac - Needed to run deployment step on my Mac
+cd ~/actions-runner
+./run.sh

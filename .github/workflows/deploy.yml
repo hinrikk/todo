@@ -25,3 +25,14 @@ jobs:
           context: ./api
           push: true
           tags: hinrikk/todo-api:latest
+
+  deploy:
+    needs: build
+    runs-on: self-hosted
+
+    steps:
+      - name: Restart Kubernetes deployment
+        run: kubectl rollout restart deployment todo-api
+
+      - name: Wait for rollout
+        run: kubectl rollout status deployment todo-api
