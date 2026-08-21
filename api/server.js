@@ -1,18 +1,13 @@
 const express = require("express");
-const { Client } = require("pg");
+const { createClient } = require("./db");
+const bcrypt = require("bcrypt");
 
 const app = express();
 const PORT = 3000;
 
 app.use(express.json());
 
-const client = new Client({
-    host: "postgres-service",
-    port: 5432,
-    user: "admin",
-    password: "password",
-    database: "tododb"
-});
+const client = createClient();
 
 client.connect()
     .then(() => console.log("Connected to PostgreSQL"))
@@ -52,6 +47,44 @@ app.post("/todos", async (req, res) => {
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: "Database error" });
+    }
+});
+
+app.post("/register", async (req, res) => {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+        return res.status(400).json({
+            error: "Email and password are required"
+        });
+    }
+
+    try {
+        const passwordHash = await bcrypt.hash(password, 12);
+
+        const result = await client.query(
+            `
+            INSERT INTO users (email, password_hash)
+            VALUES ($1, $2)
+            RETURNING id, email
+            `,
+            [email, passwordHash]
+        );
+
+        res.status(201).json(result.rows[0]);
+
+    } catch (err) {
+        console.error(err);
+
+        if (err.code === "23505") {
+            return res.status(409).json({
+                error: "User already exists"
+            });
+        }
+
+        res.status(500).json({
+            error: "Database error"
+        });
     }
 });
 
