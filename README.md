@@ -36,3 +36,26 @@ kubectl logs deployment/todo-api
 ## Start Runner on Mac - Needed to run deployment step on my Mac
 cd ~/actions-runner
 ./run.sh
+
+## Actions
+git push dev
+   ↓
+GitHub Actions workflow starts
+   ↓
+build job runs on GitHub's temporary Ubuntu runner
+   ↓
+Docker image is built
+   ↓
+Image is pushed to Docker Hub
+   ↓
+build job succeeds
+   ↓
+deploy job starts because of: needs: build
+   ↓
+deploy job runs on your self-hosted runner on your Mac
+   ↓
+kubectl rollout restart deployment todo-api
+   ↓
+Minikube recreates the API Pod
+   ↓
+new Pod pulls hinrikk/todo-api:latest from Docker Hub
