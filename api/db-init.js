@@ -1,13 +1,6 @@
-const { Client } = require("pg");
+const { createClient } = require("./db");
 
-const client = new Client({
-    host: "postgres-service",
-    port: 5432,
-    user: "admin",
-    password: "password",
-    database: "tododb"
-});
-
+const client = createClient();
 
 // Initializes the database
 // called from db-init.yaml  
@@ -16,6 +9,18 @@ async function init() {
         await client.connect();
         console.log("Connected to PostgreSQL");
 
+        // Users --------------------
+        await client.query(`
+            CREATE TABLE IF NOT EXISTS users (
+                id SERIAL PRIMARY KEY,
+                email TEXT UNIQUE NOT NULL,
+                password_hash TEXT NOT NULL
+            );
+        `);
+
+        console.log("Users table initialized");
+
+        // Todos --------------------
         await client.query(`
             CREATE TABLE IF NOT EXISTS todos (
                 id SERIAL PRIMARY KEY,
@@ -25,6 +30,7 @@ async function init() {
         `);
 
         console.log("Todos table initialized");
+
     } catch (err) {
         console.error("Database initialization failed:", err);
         process.exit(1);
