@@ -1,17 +1,9 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from "expo-router";
 import { Stack } from "expo-router";
-import * as SplashScreen from "expo-splash-screen";
-import { useColorScheme } from "react-native";
-
-
-
-SplashScreen.preventAutoHideAsync();
+import { AuthProvider } from "../context/AuthContext";
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
-
   return (
-    <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
+    <AuthProvider>
       <Stack>
         <Stack.Screen
           name="index"
@@ -22,6 +14,6 @@ export default function RootLayout() {
           options={{ headerShown: false }}
         />
       </Stack>
-    </ThemeProvider>
+    </AuthProvider>
   );
 }
