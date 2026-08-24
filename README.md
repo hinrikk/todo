@@ -59,3 +59,8 @@ kubectl rollout restart deployment todo-api
 Minikube recreates the API Pod
    ↓
 new Pod pulls hinrikk/todo-api:latest from Docker Hub
+
+
+# Mobile
+## Run on IOS Simulator
+npm run ios 
