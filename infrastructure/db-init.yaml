@@ -8,7 +8,7 @@ spec:
     spec:
       containers:
         - name: db-init
-          image: hinrikk/todo-api:latest
+          image: hinrikk/todo-api:latest # placeholder image, overwritten in deploy job
           command: ["node", "db-init.js"]
 
           env:

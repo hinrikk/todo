@@ -20,7 +20,7 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-      # Craete docker safe image tags
+      # Create docker safe image tags
       - name: Set image tag
         run: |
           BRANCH_NAME="${GITHUB_REF_NAME//\//-}"
@@ -52,6 +52,25 @@ jobs:
           kubectl create namespace $NAMESPACE \
             --dry-run=client \
             -o yaml | kubectl apply -f -
+
+      - name: Debug branch variables
+        run: |
+          echo "IMAGE_TAG=$IMAGE_TAG"
+          echo "NAMESPACE=$NAMESPACE"
+
+      - name: Run database init
+        run: |
+          kubectl delete job todo-db-init -n "$NAMESPACE" --ignore-not-found
+
+          sed "s|hinrikk/todo-api:latest|hinrikk/todo-api:$IMAGE_TAG|g" \
+            infrastructure/db-init.yaml \
+            | kubectl apply -n "$NAMESPACE" -f -
+
+          kubectl wait \
+            --for=condition=complete \
+            job/todo-db-init \
+            -n "$NAMESPACE" \
+            --timeout=120s
 
       - name: Deploy API
         run: |
