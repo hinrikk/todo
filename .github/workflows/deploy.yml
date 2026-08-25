@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - main
+      - dev
+      - "feature/**"
 
 jobs:
   build:
@@ -18,21 +20,52 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
+      # Craete docker safe image tags
+      - name: Set image tag
+        run: |
+          BRANCH_NAME="${GITHUB_REF_NAME//\//-}"
+          echo "IMAGE_TAG=$BRANCH_NAME" >> $GITHUB_ENV
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v6
         with:
           context: ./api
           push: true
-          tags: hinrikk/todo-api:latest
+          tags: hinrikk/todo-api:${{ env.IMAGE_TAG }}
 
   deploy:
     needs: build
     runs-on: self-hosted
 
     steps:
-      - name: Restart Kubernetes deployment
-        run: kubectl rollout restart deployment todo-api
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set branch variables
+        run: |
+          BRANCH_NAME="${GITHUB_REF_NAME//\//-}"
+          echo "IMAGE_TAG=$BRANCH_NAME" >> $GITHUB_ENV
+          echo "NAMESPACE=preview-$BRANCH_NAME" >> $GITHUB_ENV
+
+      - name: Create namespace
+        run: |
+          kubectl create namespace $NAMESPACE \
+            --dry-run=client \
+            -o yaml | kubectl apply -f -
+
+      - name: Deploy API
+        run: |
+          kubectl apply \
+            -f infrastructure/api.yaml \
+            -n $NAMESPACE
+
+      - name: Set branch-specific image
+        run: |
+          kubectl set image deployment/todo-api \
+            todo-api=hinrikk/todo-api:$IMAGE_TAG \
+            -n $NAMESPACE
 
       - name: Wait for rollout
-        run: kubectl rollout status deployment todo-api
+        run: |
+          kubectl rollout status deployment/todo-api \
+            -n $NAMESPACE

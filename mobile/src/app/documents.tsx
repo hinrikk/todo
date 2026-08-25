@@ -1,9 +1,18 @@
-import { View, Text } from "react-native";
+import { ScrollView, Text, StyleSheet } from "react-native";
 
 export default function DocumentsScreen() {
   return (
-    <View>
-      <Text>My Documents</Text>
-    </View>
+    <ScrollView
+      style={styles.container}
+      contentInsetAdjustmentBehavior="automatic"
+    >
+      <Text>documents...</Text>
+    </ScrollView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+});
