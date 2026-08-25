@@ -2,12 +2,25 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: todo-db-init
+
 spec:
   template:
     spec:
       containers:
         - name: db-init
-          image: todo-api
-          imagePullPolicy: Never
+          image: hinrikk/todo-api:latest
           command: ["node", "db-init.js"]
+
+          env:
+            - name: DB_HOST
+              value: "postgres-service.default.svc.cluster.local"
+            - name: DB_PORT
+              value: "5432"
+            - name: DB_USER
+              value: "admin"
+            - name: DB_PASSWORD
+              value: "password"
+            - name: DB_NAME
+              value: "tododb"
+
       restartPolicy: OnFailure
