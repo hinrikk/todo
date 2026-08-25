@@ -53,25 +53,17 @@ jobs:
             --dry-run=client \
             -o yaml | kubectl apply -f -
 
+      - name: Debug branch variables
+        run: |
+          echo "IMAGE_TAG=$IMAGE_TAG"
+          echo "NAMESPACE=$NAMESPACE"
+
       - name: Run database init
         run: |
-          kubectl delete job todo-db-init \ 
-            -n $NAMESPACE \
-            --ignore-not-found
-
-          kubectl apply \
-            -f infrastructure/db-init.yaml \
-            -n $NAMESPACE
-
-          kubectl set image job/todo-db-init \
-            db-init=hinrikk/todo-api:$IMAGE_TAG \
-            -n $NAMESPACE
-
-          kubectl wait \
-            --for=condition=complete \
-            job/todo-db-init \
-            -n $NAMESPACE \
-            --timeout=120s
+          kubectl delete job todo-db-init -n "$NAMESPACE" --ignore-not-found
+          kubectl apply -f infrastructure/db-init.yaml -n "$NAMESPACE"
+          kubectl set image job/todo-db-init db-init=hinrikk/todo-api:$IMAGE_TAG -n "$NAMESPACE"
+          kubectl wait --for=condition=complete job/todo-db-init -n "$NAMESPACE" --timeout=120s
 
       - name: Deploy API
         run: |
