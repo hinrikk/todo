@@ -46,6 +46,7 @@ jobs:
           BRANCH_NAME="${GITHUB_REF_NAME//\//-}"
           echo "IMAGE_TAG=$BRANCH_NAME" >> $GITHUB_ENV
           echo "NAMESPACE=preview-$BRANCH_NAME" >> $GITHUB_ENV
+          echo "HOSTNAME=$BRANCH_NAME.test" >> $GITHUB_ENV
 
       - name: Create namespace
         run: |
@@ -57,6 +58,7 @@ jobs:
         run: |
           echo "IMAGE_TAG=$IMAGE_TAG"
           echo "NAMESPACE=$NAMESPACE"
+          echo "HOSTNAME=$HOSTNAME"
 
       - name: Run database init
         run: |
@@ -77,6 +79,12 @@ jobs:
           kubectl apply \
             -f infrastructure/api.yaml \
             -n $NAMESPACE
+
+      - name: Deploy Ingress
+        run: |
+          sed "s|feature-test-preview.test|$HOSTNAME|g" \
+            infrastructure/ingress.yaml \
+            | kubectl apply -n "$NAMESPACE" -f -
 
       - name: Set branch-specific image
         run: |
