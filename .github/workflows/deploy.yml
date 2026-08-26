@@ -36,7 +36,8 @@ jobs:
   deploy:
     needs: build
     runs-on: self-hosted
-
+    env:
+      KUBECONFIG: /home/github-runner/.kube/config
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -46,7 +47,6 @@ jobs:
           BRANCH_NAME="${GITHUB_REF_NAME//\//-}"
           echo "IMAGE_TAG=$BRANCH_NAME" >> $GITHUB_ENV
           echo "NAMESPACE=preview-$BRANCH_NAME" >> $GITHUB_ENV
-          echo "HOSTNAME=$BRANCH_NAME.test" >> $GITHUB_ENV
 
       - name: Create namespace
         run: |
