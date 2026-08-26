@@ -1,5 +1,6 @@
 # About this Project
 
+
 This Project implements a shared notes mobile app
 The goal is to deepen my knowledge with Kubernetes and Docker while learning NodeJS
 I use React native for the Frontend
