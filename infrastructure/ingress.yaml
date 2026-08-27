@@ -8,7 +8,7 @@ spec:
   ingressClassName: traefik
 
   rules:
-    - host: feature-ingress-for-urls.test
+    - host: PREVIEW_HOST
       http:
         paths:
           - path: /

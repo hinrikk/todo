@@ -83,7 +83,7 @@ jobs:
 
       - name: Deploy Ingress
         run: |
-          sed "s|feature-test-preview.test|$HOSTNAME|g" \
+          sed "s|PREVIEW_HOST|$HOSTNAME|g" \
             infrastructure/ingress.yaml \
             | kubectl apply -n "$NAMESPACE" -f -
 
