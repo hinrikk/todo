@@ -47,6 +47,7 @@ jobs:
           BRANCH_NAME="${GITHUB_REF_NAME//\//-}"
           echo "IMAGE_TAG=$BRANCH_NAME" >> $GITHUB_ENV
           echo "NAMESPACE=preview-$BRANCH_NAME" >> $GITHUB_ENV
+          echo "HOSTNAME=$BRANCH_NAME.test.magicalotter.de" >> $GITHUB_ENV
 
       - name: Create namespace
         run: |
