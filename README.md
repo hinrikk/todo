@@ -18,11 +18,6 @@ Port:      5432
 psql -h localhost -p 5432 -U admin -d tododb
 
 
-# Build Docker Image
-docker build -t hinrikk/todo-api:latest .              
-docker push hinrikk/todo-api:latest  
-
-
 # Automatic Deployment Workflow
 
 ## Start Runner on Mac - Needed to run deployment step on my Mac
