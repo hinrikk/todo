@@ -1,0 +1,25 @@
+name: Cleanup Preview Deployment
+
+on:
+  delete:
+
+jobs:
+  cleanup:
+    # Only clean up deleted feature branches
+    if: github.event.ref_type == 'branch' && ( startsWith(github.event.ref, 'feature/') || startsWith(github.event.ref, 'chore/') )
+    runs-on: self-hosted
+
+    env:
+      KUBECONFIG: /home/github-runner/.kube/config
+
+    steps:
+      - name: Delete preview namespace
+        run: |
+          BRANCH_NAME="${{ github.event.ref }}"
+          BRANCH_NAME="${BRANCH_NAME//\//-}"
+
+          NAMESPACE="preview-$BRANCH_NAME"
+
+          echo "Deleting $NAMESPACE"
+
+          kubectl delete namespace "$NAMESPACE" --ignore-not-found
