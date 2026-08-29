@@ -37,3 +37,5 @@ cd ~/actions-runner
          - create namespace, apply, set image, rollout
 
 Note: API is connected to shared database
+
+
