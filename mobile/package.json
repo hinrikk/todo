@@ -36,6 +36,7 @@
     "typescript": "~6.0.3"
   },
   "scripts": {
+    "prestart": "node scripts/set-env.js",
     "start": "expo start",
     "reset-project": "node ./scripts/reset-project.js",
     "android": "expo start --android",

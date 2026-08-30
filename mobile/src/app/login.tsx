@@ -6,6 +6,7 @@ import { StyleSheet, Text, View } from "react-native";
 import { z } from "zod";
 import Button from "../components/Button";
 import { useAuth } from "../context/AuthContext";
+import { API_URL } from "../../config/env";
 
 const loginSchema = z.object({
   email: z.email("Please enter a valid email"),
@@ -24,33 +25,33 @@ export default function LoginScreen() {
   } = useForm<LoginForm>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      email: "",
-      password: "",
+      email: "test@mail.com",
+      password: "12345678",
     },
   });
 
   async function handleLogin(data: LoginForm) {
-    console.log("Valid registration data:", data);
-    // try {
-    //   const response = await fetch("http://localhost:3000/auth/login", {
-    //     method: "POST",
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //     },
-    //     body: JSON.stringify(data),
-    //   });
+    console.log("Login data:", data);
+    try {
+      const response = await fetch(`${API_URL}/auth/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
 
-    //   if (!response.ok) {
-    //     throw new Error("Login failed");
-    //   }
+      if (!response.ok) {
+        throw new Error("Login failed");
+      }
 
-    //   const result = await response.json();
+      const result = await response.json();
 
-    //   await setToken(result.token);
-    //   router.replace("/documents");
-    // } catch (error) {
-    //   console.error("Login error:", error);
-    // }
+      await setToken(result.token);
+      router.replace("/documents");
+    } catch (error) {
+      console.error("Login error:", error);
+    }
   }
 
   return (
