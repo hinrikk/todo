@@ -1,61 +1,47 @@
 import Input from "@/components/Input";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "expo-router";
 import { Controller, useForm } from "react-hook-form";
 import { StyleSheet, Text, View } from "react-native";
 import { z } from "zod";
+
 import Button from "../components/Button";
-import { useAuth } from "../context/AuthContext";
 
-const loginSchema = z.object({
-  email: z.email("Please enter a valid email"),
-  password: z.string().min(8, "Password must be at least 8 characters"),
-});
-type LoginForm = z.infer<typeof loginSchema>;
+const registerSchema = z
+  .object({
+    email: z.string().email("Please enter a valid email"),
 
-export default function LoginScreen() {
-  const router = useRouter();
-  const { setToken } = useAuth();
+    password: z.string().min(8, "Password must be at least 8 characters"),
 
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+  });
+
+type RegisterForm = z.infer<typeof registerSchema>;
+
+export default function RegisterScreen() {
   const {
     control,
     handleSubmit,
     formState: { errors },
-  } = useForm<LoginForm>({
-    resolver: zodResolver(loginSchema),
+  } = useForm<RegisterForm>({
+    resolver: zodResolver(registerSchema),
     defaultValues: {
       email: "",
       password: "",
+      confirmPassword: "",
     },
   });
 
-  async function handleLogin(data: LoginForm) {
+  function handleRegister(data: RegisterForm) {
     console.log("Valid registration data:", data);
-    // try {
-    //   const response = await fetch("http://localhost:3000/auth/login", {
-    //     method: "POST",
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //     },
-    //     body: JSON.stringify(data),
-    //   });
-
-    //   if (!response.ok) {
-    //     throw new Error("Login failed");
-    //   }
-
-    //   const result = await response.json();
-
-    //   await setToken(result.token);
-    //   router.replace("/documents");
-    // } catch (error) {
-    //   console.error("Login error:", error);
-    // }
   }
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Welcome back!</Text>
+      <Text style={styles.title}>Welcome!</Text>
 
       <Controller
         control={control}
@@ -92,23 +78,30 @@ export default function LoginScreen() {
         <Text style={styles.error}>{errors.password.message}</Text>
       )}
 
-      <Button
-        title="Login"
-        style={{ marginTop: 16 }}
-        onPress={handleSubmit(handleLogin)}
+      <Controller
+        control={control}
+        name="confirmPassword"
+        render={({ field: { onChange, onBlur, value } }) => (
+          <Input
+            placeholder="Confirm Password"
+            value={value}
+            onChangeText={onChange}
+            onBlur={onBlur}
+            secureTextEntry
+          />
+        )}
       />
 
-      <Text style={styles.or}>or</Text>
+      {errors.confirmPassword && (
+        <Text style={styles.error}>{errors.confirmPassword.message}</Text>
+      )}
 
       <Button
         title="Sign Up"
-        backgroundColor="white"
-        textColor="black"
         style={{
-          borderWidth: 2,
-          borderColor: "black",
+          marginTop: 32,
         }}
-        onPress={() => router.replace("/register")}
+        onPress={handleSubmit(handleRegister)}
       />
     </View>
   );
@@ -127,10 +120,6 @@ const styles = StyleSheet.create({
     marginBottom: 64,
     textAlign: "left",
     fontWeight: "bold",
-  },
-  or: {
-    textAlign: "center",
-    fontSize: 16,
   },
   error: {
     color: "red",
