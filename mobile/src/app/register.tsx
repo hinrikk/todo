@@ -3,8 +3,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 import { StyleSheet, Text, View } from "react-native";
 import { z } from "zod";
+import { API_URL } from "../../config/env";
 
 import Button from "../components/Button";
+import { useRouter } from "expo-router";
 
 const registerSchema = z
   .object({
@@ -35,8 +37,28 @@ export default function RegisterScreen() {
     },
   });
 
-  function handleRegister(data: RegisterForm) {
-    console.log("Valid registration data:", data);
+  const router = useRouter();
+
+  async function handleRegister(data: RegisterForm) {
+    console.log("Register data:", data);
+    try {
+      const response = await fetch(`${API_URL}/auth/register`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        throw new Error("Register failed");
+      }
+      
+      router.replace("/login");
+
+    } catch (error) {
+      console.error("Register error:", error);
+    }
   }
 
   return (
