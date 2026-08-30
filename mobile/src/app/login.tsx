@@ -6,6 +6,7 @@ import { StyleSheet, Text, View } from "react-native";
 import { z } from "zod";
 import Button from "../components/Button";
 import { useAuth } from "../context/AuthContext";
+import { API_URL } from "../../config/env";
 
 const loginSchema = z.object({
   email: z.email("Please enter a valid email"),
