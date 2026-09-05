@@ -9,11 +9,12 @@ import {
   Text,
   View,
 } from "react-native";
+import Swipeable from "react-native-gesture-handler/ReanimatedSwipeable";
 import { SafeAreaView } from "react-native-safe-area-context";
 import type { Document } from "../types/documents";
 
 export default function DocumentsScreen() {
-  const { getDocuments, createDocument } = useDocumentsApi();
+  const { getDocuments, createDocument, deleteDocument } = useDocumentsApi();
   const [documents, setDocuments] = useState<Document[]>([]);
   const [refreshing, setRefreshing] = useState(false);
 
@@ -42,6 +43,29 @@ export default function DocumentsScreen() {
     setRefreshing(false);
   }
 
+  async function handleDeleteDocument(documentId: number) {
+    try {
+      await deleteDocument(documentId);
+
+      setDocuments((currentDocuments) =>
+        currentDocuments.filter((document) => document.id !== documentId),
+      );
+    } catch (error) {
+      console.error("Delete document error:", error);
+    }
+  }
+
+  function renderRightActions(documentId: number) {
+    return (
+      <Pressable
+        onPress={() => handleDeleteDocument(documentId)}
+        style={styles.deleteButton}
+      >
+        <Ionicons name="trash" size={24} color="white" />
+      </Pressable>
+    );
+  }
+
   useEffect(() => {
     loadDocuments();
     console.log(documents);
@@ -62,22 +86,43 @@ export default function DocumentsScreen() {
         }
       >
         {documents.map((document) => (
-          <View key={document.id} style={styles.listItemContainer}>
-            <View style={{ flex: 2, backgroundColor: "blue" }}>
-              <Text style={styles.listItemTitle}>{document.title}</Text>
-              <Text style={styles.listItemText}>{document.content}</Text>
-            </View>
-            <View style={styles.memberListContainer}>
-              <View style={styles.memberList}>
-                  {document.members?.map((member) => (
-                    <View key={member.id} style={styles.member}>
-                      <Text>
-                        {member.email.charAt(0).toUpperCase()}
-                      </Text>
-                    </View>
-                  ))}
+          <View style={styles.swipeContainer} key={document.id}>
+            <Swipeable
+              renderRightActions={() => renderRightActions(document.id)}
+            >
+              <View style={styles.listItemContainer}>
+                <View style={styles.documentTitleContainer}>
+                  <Text style={styles.listItemTitle}>{document.title}</Text>
+                  <Text style={styles.listItemText}>{document.content}</Text>
+                </View>
+                <View style={styles.memberListContainer}>
+                  <View style={styles.memberList}>
+                    {/* Placeholder */}
+                    {document.members.length < 2 && (
+                      <View style={{ flex: 1 }}></View>
+                    )}
+                    {/* Placeholder */}
+                    {document.members.length < 3 && (
+                      <View style={{ flex: 1 }}></View>
+                    )}
+                    {document.members?.map((member) => (
+                      <View key={member.id} style={styles.member}>
+                        <Text>{member.email.charAt(0).toUpperCase()}</Text>
+                      </View>
+                    ))}
+                  </View>
+                </View>
+                <View style={styles.arrowContainer}>
+                  <Pressable
+                    onPress={() => {
+                      console.log("document details");
+                    }}
+                  >
+                    <Ionicons name="chevron-forward" size={24} color="black" />
+                  </Pressable>
+                </View>
               </View>
-            </View>
+            </Swipeable>
           </View>
         ))}
       </ScrollView>
@@ -91,17 +136,27 @@ const styles = StyleSheet.create({
     padding: 16,
     backgroundColor: "f2f2f2",
   },
+  documentTitleContainer: {
+    flex: 4,
+  },
   title: {
     fontSize: 32,
-    marginBottom: 32,
+    marginVertical: 32,
     textAlign: "left",
     fontWeight: "bold",
   },
   topButtonContainer: {
     alignItems: "flex-end",
+    marginBottom: 8,
+  },
+  swipeContainer: {
+    borderRadius: 8,
+    overflow: "hidden",
+    marginBottom: 8,
+    backgroundColor: "white",
   },
   listContainer: {
-    backgroundColor: "red",
+    flex: 1,
   },
   listItemContainer: {
     backgroundColor: "white",
@@ -119,14 +174,12 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   memberListContainer: {
-    flex: 1,
-    backgroundColor: "green",
+    flex: 2,
     justifyContent: "center",
   },
   memberList: {
     flexDirection: "row",
     gap: 2,
-    backgroundColor: "pink",
   },
   member: {
     flex: 1,
@@ -135,5 +188,18 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "yellow",
+  },
+  arrowContainer: {
+    flex: 1,
+    alignItems: "flex-end",
+    justifyContent: "center",
+  },
+
+  deleteButton: {
+    backgroundColor: "red",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 8,
+    paddingHorizontal: 16,
   },
 });

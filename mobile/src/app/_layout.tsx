@@ -1,23 +1,27 @@
 import { Stack } from "expo-router";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { AuthProvider } from "../context/AuthContext";
 
 export default function RootLayout() {
   return (
     <AuthProvider>
-      <Stack
-        screenOptions={{
-          // iOS large title
-          headerLargeTitle: true,
-          // Keep header transparent / integrated with content
-          headerShadowVisible: false,
-          headerBackTitle: "Folder",
-        }}
-      >
-        <Stack.Screen name="index" options={{ headerShown: false }} />
-        <Stack.Screen name="login" options={{ headerShown: false }} />
-        <Stack.Screen name="register" options={{ headerShown: false }} />
-        <Stack.Screen name="documents" options={{ headerShown: false }} />
-      </Stack>
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <Stack
+          screenOptions={{
+            // iOS large title
+            headerLargeTitle: true,
+            // Keep header transparent / integrated with content
+            headerShadowVisible: false,
+            headerBackTitle: "Folder",
+            headerShown: false,
+          }}
+        >
+          <Stack.Screen name="index" />
+          <Stack.Screen name="login" />
+          <Stack.Screen name="register" />
+          <Stack.Screen name="documents" />
+        </Stack>
+      </GestureHandlerRootView>
     </AuthProvider>
   );
 }
