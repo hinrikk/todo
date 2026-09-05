@@ -29,6 +29,7 @@ export default function DocumentsScreen() {
   async function loadDocuments() {
     try {
       const data = await getDocuments();
+      console.log("Documents from API:", data);
       setDocuments(data);
     } catch (error) {
       console.error(error);
@@ -68,7 +69,7 @@ export default function DocumentsScreen() {
             </View>
             <View style={styles.memberListContainer}>
               <View style={styles.memberList}>
-                  {document.members.map((member) => (
+                  {document.members?.map((member) => (
                     <View key={member.id} style={styles.member}>
                       <Text>
                         {member.email.charAt(0).toUpperCase()}
