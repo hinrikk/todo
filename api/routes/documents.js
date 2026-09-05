@@ -55,18 +55,39 @@ router.get("/", authenticateToken, async (req, res) => {
     try {
         const result = await db.query(
             `
-            SELECT d.*
+            SELECT
+                d.id,
+                d.title,
+                d.content,
+                COALESCE(
+                json_agg(
+                    json_build_object(
+                    'id', u.id,
+                    'email', u.email
+                    )
+                ) FILTER (WHERE u.id IS NOT NULL),
+                '[]'
+                ) AS members
             FROM documents d
-            JOIN document_users du
-                ON d.id = du.document_id
-            WHERE du.user_id = $1
-            ORDER BY d.id
+
+            JOIN document_users current_user_doc
+                ON current_user_doc.document_id = d.id
+
+            LEFT JOIN document_users du
+                ON du.document_id = d.id
+
+            LEFT JOIN users u
+                ON u.id = du.user_id
+
+            WHERE current_user_doc.user_id = $1
+
+            GROUP BY d.id
+            ORDER BY d.id DESC
             `,
             [userId]
         );
-
         res.json(result.rows);
-
+        
     } catch (err) {
         console.error(err);
 
