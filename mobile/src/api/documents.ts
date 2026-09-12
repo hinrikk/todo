@@ -69,10 +69,35 @@ export function useDocumentsApi() {
     return response.json();
   }
 
+  async function updateDocument(
+    documentId: number,
+    title: string,
+    content: string,
+  ) {
+    if (!token) {
+      throw new Error("User is not authenticated");
+    }
+
+    const response = await apiFetch(`/documents/${documentId}`, token, {
+      method: "PATCH",
+      body: JSON.stringify({
+        title,
+        content,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to update document");
+    }
+
+    return response.json();
+  }
+
   return {
     createDocument,
     getDocument,
     getDocuments,
     deleteDocument,
+    updateDocument,
   };
 }

@@ -247,4 +247,42 @@ router.get("/:id", authenticateToken, async (req, res) => {
   }
 });
 
+router.patch("/:id", authenticateToken, async (req, res) => {
+  const documentId = req.params.id;
+  const userId = req.user.userId;
+  const { title, content } = req.body;
+
+  try {
+    const result = await db.query(
+      `
+      UPDATE documents
+      SET title = $1, content = $2
+      WHERE id = $3
+        AND EXISTS (
+          SELECT 1
+          FROM document_users
+          WHERE document_id = $3
+            AND user_id = $4
+        )
+      RETURNING *
+      `,
+      [title, content, documentId, userId],
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(403).json({
+        error: "You don't have access to this document",
+      });
+    }
+
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error(err);
+
+    res.status(500).json({
+      error: "Database error",
+    });
+  }
+});
+
 module.exports = router;
