@@ -1,6 +1,7 @@
 import { useDocumentsApi } from "@/api/documents";
 import { Ionicons } from "@expo/vector-icons";
-import { useEffect, useState } from "react";
+import { useFocusEffect, useRouter } from "expo-router";
+import { useCallback, useState } from "react";
 import {
   Pressable,
   RefreshControl,
@@ -11,9 +12,10 @@ import {
 } from "react-native";
 import Swipeable from "react-native-gesture-handler/ReanimatedSwipeable";
 import { SafeAreaView } from "react-native-safe-area-context";
-import type { Document } from "../types/documents";
+import type { Document } from "../../types/documents";
 
 export default function DocumentsScreen() {
+  const router = useRouter();
   const { getDocuments, createDocument, deleteDocument } = useDocumentsApi();
   const [documents, setDocuments] = useState<Document[]>([]);
   const [refreshing, setRefreshing] = useState(false);
@@ -66,10 +68,11 @@ export default function DocumentsScreen() {
     );
   }
 
-  useEffect(() => {
+useFocusEffect(
+  useCallback(() => {
     loadDocuments();
-    console.log(documents);
-  }, []);
+  }, []),
+);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -90,7 +93,15 @@ export default function DocumentsScreen() {
             <Swipeable
               renderRightActions={() => renderRightActions(document.id)}
             >
-              <View style={styles.listItemContainer}>
+              <Pressable
+                style={styles.listItemContainer}
+                onPress={() =>
+                  router.push({
+                    pathname: "/documents/[id]",
+                    params: { id: document.id },
+                  })
+                }
+              >
                 <View style={styles.documentTitleContainer}>
                   <Text style={styles.listItemTitle}>{document.title}</Text>
                   <Text style={styles.listItemText}>{document.content}</Text>
@@ -113,15 +124,9 @@ export default function DocumentsScreen() {
                   </View>
                 </View>
                 <View style={styles.arrowContainer}>
-                  <Pressable
-                    onPress={() => {
-                      console.log("document details");
-                    }}
-                  >
                     <Ionicons name="chevron-forward" size={24} color="black" />
-                  </Pressable>
                 </View>
-              </View>
+              </Pressable>
             </Swipeable>
           </View>
         ))}

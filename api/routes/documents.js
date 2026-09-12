@@ -190,4 +190,99 @@ router.delete("/:id", authenticateToken, async (req, res) => {
   }
 });
 
+// GET one document
+router.get("/:id", authenticateToken, async (req, res) => {
+  const documentId = req.params.id;
+  const userId = req.user.userId;
+
+  try {
+    const result = await db.query(
+      `
+      SELECT
+        d.id,
+        d.title,
+        d.content,
+        COALESCE(
+          json_agg(
+            json_build_object(
+              'id', u.id,
+              'email', u.email
+            )
+          ) FILTER (WHERE u.id IS NOT NULL),
+          '[]'
+        ) AS members
+
+      FROM documents d
+
+      JOIN document_users current_user_doc
+        ON current_user_doc.document_id = d.id
+
+      LEFT JOIN document_users du
+        ON du.document_id = d.id
+
+      LEFT JOIN users u
+        ON u.id = du.user_id
+
+      WHERE d.id = $1
+        AND current_user_doc.user_id = $2
+
+      GROUP BY d.id
+      `,
+      [documentId, userId],
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        error: "Document not found",
+      });
+    }
+
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error(err);
+
+    res.status(500).json({
+      error: "Database error",
+    });
+  }
+});
+
+router.patch("/:id", authenticateToken, async (req, res) => {
+  const documentId = req.params.id;
+  const userId = req.user.userId;
+  const { title, content } = req.body;
+
+  try {
+    const result = await db.query(
+      `
+      UPDATE documents
+      SET title = $1, content = $2
+      WHERE id = $3
+        AND EXISTS (
+          SELECT 1
+          FROM document_users
+          WHERE document_id = $3
+            AND user_id = $4
+        )
+      RETURNING *
+      `,
+      [title, content, documentId, userId],
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(403).json({
+        error: "You don't have access to this document",
+      });
+    }
+
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error(err);
+
+    res.status(500).json({
+      error: "Database error",
+    });
+  }
+});
+
 module.exports = router;
