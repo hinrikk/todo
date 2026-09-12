@@ -1,5 +1,4 @@
 import {
-  boolean,
   integer,
   pgTable,
   primaryKey,
@@ -36,9 +35,3 @@ export const documentUsers = pgTable(
     pk: primaryKey({ columns: [table.documentId, table.userId] }),
   }),
 );
-
-export const todos = pgTable("todos", {
-  id: serial("id").primaryKey(),
-  title: text("title").notNull(),
-  completed: boolean("completed").default(false),
-});
