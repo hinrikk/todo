@@ -9,7 +9,7 @@ spec:
       containers:
         - name: db-init
           image: hinrikk/todo-api:latest
-          command: ["yarn", "drizzle-kit", "migrate"]
+          command: ["node", "dist/db/migrate.js"]
 
           env:
             - name: DB_HOST
