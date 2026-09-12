@@ -8,8 +8,8 @@ spec:
     spec:
       containers:
         - name: db-init
-          image: hinrikk/todo-api:latest # placeholder image, overwritten in deploy job
-          command: ["node", "db-init.js"]
+          image: hinrikk/todo-api:latest
+          command: ["yarn", "drizzle-kit", "migrate"]
 
           env:
             - name: DB_HOST
@@ -24,4 +24,3 @@ spec:
               value: "tododb"
 
       restartPolicy: OnFailure
-      

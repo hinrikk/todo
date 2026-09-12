@@ -42,6 +42,9 @@ export default function LoginScreen() {
       });
 
       if (!response.ok) {
+        const errorText = await response.text();
+        console.log("Login status:", response.status);
+        console.log("Login response:", errorText);
         throw new Error("Login failed");
       }
 
