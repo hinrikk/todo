@@ -11,21 +11,21 @@ export default function DocumentScreen() {
   const { getDocument } = useDocumentsApi();
   const [document, setDocument] = useState<Document | null>(null);
 
+  async function loadDocument() {
+    if (!id) return;
+
+    const data = await getDocument(Number(id));
+    console.log("Loaded document:", data);
+    setDocument(data);
+  }
+
   useEffect(() => {
-    async function loadDocument() {
-      if (!id) return;
-
-      const data = await getDocument(Number(id));
-      console.log("Loaded document:", data);
-      setDocument(data);
-    }
-
     loadDocument();
   }, [id]);
 
   return (
     <SafeAreaView style={styles.container}>
-      {document && <DocumentEditor document={document} />}
+      {document && <DocumentEditor document={document} refetchDocument={loadDocument}/>}
     </SafeAreaView>
   );
 }

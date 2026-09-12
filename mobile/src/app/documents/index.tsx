@@ -1,7 +1,7 @@
 import { useDocumentsApi } from "@/api/documents";
 import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
-import { useEffect, useState } from "react";
+import { useFocusEffect, useRouter } from "expo-router";
+import { useCallback, useState } from "react";
 import {
   Pressable,
   RefreshControl,
@@ -68,10 +68,11 @@ export default function DocumentsScreen() {
     );
   }
 
-  useEffect(() => {
+useFocusEffect(
+  useCallback(() => {
     loadDocuments();
-    console.log(documents);
-  }, []);
+  }, []),
+);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -123,13 +124,7 @@ export default function DocumentsScreen() {
                   </View>
                 </View>
                 <View style={styles.arrowContainer}>
-                  <Pressable
-                    onPress={() => {
-                      console.log("document details");
-                    }}
-                  >
                     <Ionicons name="chevron-forward" size={24} color="black" />
-                  </Pressable>
                 </View>
               </Pressable>
             </Swipeable>

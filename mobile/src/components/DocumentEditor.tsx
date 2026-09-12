@@ -10,9 +10,10 @@ import Input from "./Input";
 
 type DocumentEditorProps = {
   document: Document;
+  refetchDocument: () => Promise<void>;
 };
 
-export default function DocumentEditor({ document }: DocumentEditorProps) {
+export default function DocumentEditor({ document, refetchDocument }: DocumentEditorProps) {
   const { updateDocument } = useDocumentsApi();
   const router = useRouter();
   const editorSchema = z.object({
@@ -23,6 +24,7 @@ export default function DocumentEditor({ document }: DocumentEditorProps) {
 
   async function onSubmit(data: EditorForm) {
     await updateDocument(document.id, data.title, data.content);
+    await refetchDocument();
   }
 
   const {
