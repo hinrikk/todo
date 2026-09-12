@@ -9,6 +9,7 @@ spec:
       containers:
         - name: db-init
           image: hinrikk/todo-api:latest
+          imagePullPolicy: Always
           command: ["node", "dist/db/migrate.js"]
 
           env:
