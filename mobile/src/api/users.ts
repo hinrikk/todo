@@ -21,10 +21,7 @@ export function useUsersApi() {
         method: "GET",
       },
     );
-    const raw = await response.text();
 
-    console.log("Search status:", response.status);
-    console.log("Search response:", raw);
     if (!response.ok) {
       throw new Error("Failed to search users");
     }

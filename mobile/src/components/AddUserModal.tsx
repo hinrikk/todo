@@ -63,6 +63,14 @@ export default function AddUserModal({ visible, onClose }: AddUserModalProps) {
             onChangeText={setSearch}
             autoCapitalize="none"
           />
+
+          <View>
+            {users.map((user) => (
+              <View key={user.id}>
+                <Text>{user.email}</Text>
+              </View>
+            ))}
+          </View>
         </View>
       </View>
     </Modal>
