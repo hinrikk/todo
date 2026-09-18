@@ -1,5 +1,7 @@
+import { useUsersApi } from "@/api/users";
+import { User } from "@/types/user";
 import { Ionicons } from "@expo/vector-icons";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Modal, Pressable, StyleSheet, Text, View } from "react-native";
 import Input from "./Input";
 
@@ -9,12 +11,35 @@ type AddUserModalProps = {
 };
 
 export default function AddUserModal({ visible, onClose }: AddUserModalProps) {
+  const { searchUsers } = useUsersApi();
   const [search, setSearch] = useState("");
+  const [users, setUsers] = useState<User[]>([]);
+
+  useEffect(() => {
+    if (search.trim().length < 3) {
+      setUsers([]);
+      return;
+    }
+
+    const timeout = setTimeout(async () => {
+      try {
+        const result = await searchUsers(search);
+        setUsers(result);
+        console.log(users);
+      } catch (error) {
+        console.error("User search failed:", error);
+      }
+    }, 300);
+
+    return () => clearTimeout(timeout);
+  }, [search]);
 
   function handleClose() {
     setSearch("");
     onClose();
   }
+
+  console.log();
   return (
     <Modal
       visible={visible}
