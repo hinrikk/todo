@@ -3,9 +3,11 @@ import { Document } from "@/types/documents";
 import { User } from "@/types/user";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import z from "zod";
+import AddUserModal from "./AddUserModal";
 import Input from "./Input";
 
 type DocumentEditorProps = {
@@ -13,7 +15,10 @@ type DocumentEditorProps = {
   refetchDocument: () => Promise<void>;
 };
 
-export default function DocumentEditor({ document, refetchDocument }: DocumentEditorProps) {
+export default function DocumentEditor({
+  document,
+  refetchDocument,
+}: DocumentEditorProps) {
   const { updateDocument } = useDocumentsApi();
   const router = useRouter();
   const editorSchema = z.object({
@@ -38,6 +43,8 @@ export default function DocumentEditor({ document, refetchDocument }: DocumentEd
     },
   });
 
+  const [userModalVisible, setUserModalVisible] = useState(false);
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -55,7 +62,7 @@ export default function DocumentEditor({ document, refetchDocument }: DocumentEd
 
           <Pressable
             onPress={() => {
-              console.log("add");
+              setUserModalVisible(true);
             }}
             style={styles.addButton}
           >
@@ -94,6 +101,11 @@ export default function DocumentEditor({ document, refetchDocument }: DocumentEd
             multiline={true}
           />
         )}
+      />
+
+      <AddUserModal
+        visible={userModalVisible}
+        onClose={() => setUserModalVisible(false)}
       />
     </View>
   );
