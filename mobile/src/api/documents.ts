@@ -93,11 +93,31 @@ export function useDocumentsApi() {
     return response.json();
   }
 
+  async function addUserToDocument(documentId: number, userId: number) {
+    if (!token) {
+      throw new Error("User is not authenticated");
+    }
+
+    const response = await apiFetch(`/documents/${documentId}/users`, token, {
+      method: "POST",
+      body: JSON.stringify({
+        userId,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to add user to document");
+    }
+
+    return response.json();
+  }
+
   return {
     createDocument,
     getDocument,
     getDocuments,
     deleteDocument,
     updateDocument,
+    addUserToDocument,
   };
 }

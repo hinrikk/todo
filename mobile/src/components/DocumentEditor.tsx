@@ -51,7 +51,12 @@ export default function DocumentEditor({
         <Pressable onPress={() => router.back()} style={styles.backButton}>
           <Ionicons name="chevron-back" size={24} color="white" />
         </Pressable>
-        <View style={styles.memberContainer}>
+        <Pressable
+          style={styles.memberContainer}
+          onPress={() => {
+            setUserModalVisible(true);
+          }}
+        >
           {document.members.map((member: User) => (
             <View key={member.id} style={styles.member}>
               <Text style={{ fontWeight: "bold" }}>
@@ -60,15 +65,10 @@ export default function DocumentEditor({
             </View>
           ))}
 
-          <Pressable
-            onPress={() => {
-              setUserModalVisible(true);
-            }}
-            style={styles.addButton}
-          >
-            <Ionicons name="add" size={16} color="white" />
-          </Pressable>
-        </View>
+          <View style={[styles.member, { backgroundColor: "black" }]}>
+            <Ionicons name="person-add-outline" size={16} color="white" />
+          </View>
+        </Pressable>
         <Pressable onPress={handleSubmit(onSubmit)} style={styles.saveButton}>
           <Text style={styles.saveButtonText}>Save</Text>
         </Pressable>
@@ -106,6 +106,9 @@ export default function DocumentEditor({
       <AddUserModal
         visible={userModalVisible}
         onClose={() => setUserModalVisible(false)}
+        members={document.members}
+        documentId={document.id}
+        refetchDocument={refetchDocument}
       />
     </View>
   );

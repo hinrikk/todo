@@ -5,8 +5,8 @@ import { StyleSheet, Text, View } from "react-native";
 import { z } from "zod";
 import { API_URL } from "../../config/env";
 
-import Button from "../components/Button";
 import { useRouter } from "expo-router";
+import Button from "../components/Button";
 
 const registerSchema = z
   .object({
@@ -31,9 +31,9 @@ export default function RegisterScreen() {
   } = useForm<RegisterForm>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
-      email: "",
-      password: "",
-      confirmPassword: "",
+      email: "test@mail.com",
+      password: "123456789",
+      confirmPassword: "123456789",
     },
   });
 
@@ -53,9 +53,8 @@ export default function RegisterScreen() {
       if (!response.ok) {
         throw new Error("Register failed");
       }
-      
-      router.replace("/login");
 
+      router.replace("/login");
     } catch (error) {
       console.error("Register error:", error);
     }
@@ -92,6 +91,8 @@ export default function RegisterScreen() {
             onChangeText={onChange}
             onBlur={onBlur}
             secureTextEntry
+            autoComplete="off"
+            textContentType="oneTimeCode"
           />
         )}
       />
@@ -110,6 +111,8 @@ export default function RegisterScreen() {
             onChangeText={onChange}
             onBlur={onBlur}
             secureTextEntry
+            autoComplete="off"
+            textContentType="oneTimeCode"
           />
         )}
       />
