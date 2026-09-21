@@ -3,9 +3,11 @@ import { Document } from "@/types/documents";
 import { User } from "@/types/user";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import z from "zod";
+import AddUserModal from "./AddUserModal";
 import Input from "./Input";
 
 type DocumentEditorProps = {
@@ -13,7 +15,10 @@ type DocumentEditorProps = {
   refetchDocument: () => Promise<void>;
 };
 
-export default function DocumentEditor({ document, refetchDocument }: DocumentEditorProps) {
+export default function DocumentEditor({
+  document,
+  refetchDocument,
+}: DocumentEditorProps) {
   const { updateDocument } = useDocumentsApi();
   const router = useRouter();
   const editorSchema = z.object({
@@ -38,13 +43,20 @@ export default function DocumentEditor({ document, refetchDocument }: DocumentEd
     },
   });
 
+  const [userModalVisible, setUserModalVisible] = useState(false);
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <Pressable onPress={() => router.back()} style={styles.backButton}>
           <Ionicons name="chevron-back" size={24} color="white" />
         </Pressable>
-        <View style={styles.memberContainer}>
+        <Pressable
+          style={styles.memberContainer}
+          onPress={() => {
+            setUserModalVisible(true);
+          }}
+        >
           {document.members.map((member: User) => (
             <View key={member.id} style={styles.member}>
               <Text style={{ fontWeight: "bold" }}>
@@ -53,15 +65,10 @@ export default function DocumentEditor({ document, refetchDocument }: DocumentEd
             </View>
           ))}
 
-          <Pressable
-            onPress={() => {
-              console.log("add");
-            }}
-            style={styles.addButton}
-          >
-            <Ionicons name="add" size={16} color="white" />
-          </Pressable>
-        </View>
+          <View style={[styles.member, { backgroundColor: "black" }]}>
+            <Ionicons name="person-add-outline" size={16} color="white" />
+          </View>
+        </Pressable>
         <Pressable onPress={handleSubmit(onSubmit)} style={styles.saveButton}>
           <Text style={styles.saveButtonText}>Save</Text>
         </Pressable>
@@ -94,6 +101,14 @@ export default function DocumentEditor({ document, refetchDocument }: DocumentEd
             multiline={true}
           />
         )}
+      />
+
+      <AddUserModal
+        visible={userModalVisible}
+        onClose={() => setUserModalVisible(false)}
+        members={document.members}
+        documentId={document.id}
+        refetchDocument={refetchDocument}
       />
     </View>
   );
