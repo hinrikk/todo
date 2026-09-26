@@ -1,39 +1,26 @@
-# About this Project
+# About This Project
+
+This project implements a shared notes mobile app that works across both Android and iOS.
+
+The main goal was to gain experience with Node.js while also experimenting with Kubernetes and CI/CD workflows.
+
+One of the most interesting aspects of the project is its support for feature branch deployments. Whenever a developer creates or pushes to a feature branch, GitHub Actions automatically build a Docker image and deploy it to the Kubernetes cluster with its own dedicated subdomain.
+Each branch therefore runs in its own isolated environment, independently of the dev environment and other feature branches.
 
 
-This Project implements a shared notes mobile app
-The goal is to deepen my knowledge with Kubernetes and Docker while learning NodeJS
-I use React native for the Frontend
+# Architecture
+
+Backend: NodeJS, Drizzle ORM, PostgreSQL
+Frontend: React Native
+Orchestration: Kubernetes, Docker
 
 
-# Database (Postgres)
+# Screenshots
 
-## Credentials
-Database:  mydb
-User:      admin
-Password:  password
-Port:      5432
-
-## Connect to Database
-psql -h localhost -p 5432 -U admin -d tododb
+<p>
+  <img src="./docs/docs.png" width="250" />
+  <img src="./docs/member.png" width="250" />
+</p>
 
 
-# Automatic Deployment Workflow
 
-## Start Runner on Mac - Needed to run deployment step on my Mac
-cd ~/actions-runner
-./run.sh
-
-- Push feature branch
-- Github notices push -> checks if specified workflow fits branch
-   - workflows are speciified under ./github/workflows
-- deploy workflow starts
-   - build job:
-      - runs on temporary GitHub machine
-      - builds and pushed docker image with feature branch as tag
-   - deploy job:
-      - runs on self hosted GitHub runner
-      - executes kubectl commands
-         - create namespace, apply, set image, rollout
-
-Note: API is connected to shared database

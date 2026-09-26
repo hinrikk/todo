@@ -1,39 +1,48 @@
 import Input from "@/components/Input";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "expo-router";
 import { Controller, useForm } from "react-hook-form";
 import { StyleSheet, Text, View } from "react-native";
 import { z } from "zod";
-import Button from "../components/Button";
-import { useAuth } from "../context/AuthContext";
 import { API_URL } from "../../config/env";
 
-const loginSchema = z.object({
-  email: z.email("Please enter a valid email"),
-  password: z.string().min(8, "Password must be at least 8 characters"),
-});
-type LoginForm = z.infer<typeof loginSchema>;
+import { useRouter } from "expo-router";
+import Button from "../components/Button";
 
-export default function LoginScreen() {
-  const router = useRouter();
-  const { setToken } = useAuth();
+const registerSchema = z
+  .object({
+    email: z.string().email("Please enter a valid email"),
 
+    password: z.string().min(8, "Password must be at least 8 characters"),
+
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+  });
+
+type RegisterForm = z.infer<typeof registerSchema>;
+
+export default function RegisterScreen() {
   const {
     control,
     handleSubmit,
     formState: { errors },
-  } = useForm<LoginForm>({
-    resolver: zodResolver(loginSchema),
+  } = useForm<RegisterForm>({
+    resolver: zodResolver(registerSchema),
     defaultValues: {
       email: "test@mail.com",
-      password: "12345678",
+      password: "123456789",
+      confirmPassword: "123456789",
     },
   });
 
-  async function handleLogin(data: LoginForm) {
-    console.log("Login data:", data);
+  const router = useRouter();
+
+  async function handleRegister(data: RegisterForm) {
+    console.log("Register data:", data);
     try {
-      const response = await fetch(`${API_URL}/auth/login`, {
+      const response = await fetch(`${API_URL}/auth/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -42,24 +51,18 @@ export default function LoginScreen() {
       });
 
       if (!response.ok) {
-        const errorText = await response.text();
-        console.log("Login status:", response.status);
-        console.log("Login response:", errorText);
-        throw new Error("Login failed");
+        throw new Error("Register failed");
       }
 
-      const result = await response.json();
-
-      await setToken(result.token);
-      router.replace("/documents");
+      router.replace("/login");
     } catch (error) {
-      console.error("Login error:", error);
+      console.error("Register error:", error);
     }
   }
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Welcome back!</Text>
+      <Text style={styles.title}>Welcome!</Text>
 
       <Controller
         control={control}
@@ -88,6 +91,8 @@ export default function LoginScreen() {
             onChangeText={onChange}
             onBlur={onBlur}
             secureTextEntry
+            autoComplete="off"
+            textContentType="oneTimeCode"
           />
         )}
       />
@@ -96,23 +101,32 @@ export default function LoginScreen() {
         <Text style={styles.error}>{errors.password.message}</Text>
       )}
 
-      <Button
-        title="Login"
-        style={{ marginTop: 16 }}
-        onPress={handleSubmit(handleLogin)}
+      <Controller
+        control={control}
+        name="confirmPassword"
+        render={({ field: { onChange, onBlur, value } }) => (
+          <Input
+            placeholder="Confirm Password"
+            value={value}
+            onChangeText={onChange}
+            onBlur={onBlur}
+            secureTextEntry
+            autoComplete="off"
+            textContentType="oneTimeCode"
+          />
+        )}
       />
 
-      <Text style={styles.or}>or</Text>
+      {errors.confirmPassword && (
+        <Text style={styles.error}>{errors.confirmPassword.message}</Text>
+      )}
 
       <Button
         title="Sign Up"
-        backgroundColor="white"
-        textColor="black"
         style={{
-          borderWidth: 2,
-          borderColor: "black",
+          marginTop: 32,
         }}
-        onPress={() => router.replace("/register")}
+        onPress={handleSubmit(handleRegister)}
       />
     </View>
   );
@@ -131,10 +145,6 @@ const styles = StyleSheet.create({
     marginBottom: 64,
     textAlign: "left",
     fontWeight: "bold",
-  },
-  or: {
-    textAlign: "center",
-    fontSize: 16,
   },
   error: {
     color: "red",
