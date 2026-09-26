@@ -11,6 +11,7 @@ import {
   View,
 } from "react-native";
 import Swipeable from "react-native-gesture-handler/ReanimatedSwipeable";
+import Animated, { BounceInUp } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 import type { Document } from "../../types/documents";
 
@@ -68,11 +69,11 @@ export default function DocumentsScreen() {
     );
   }
 
-useFocusEffect(
-  useCallback(() => {
-    loadDocuments();
-  }, []),
-);
+  useFocusEffect(
+    useCallback(() => {
+      loadDocuments();
+    }, []),
+  );
 
   return (
     <SafeAreaView style={styles.container}>
@@ -88,47 +89,52 @@ useFocusEffect(
           <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
         }
       >
-        {documents.map((document) => (
-          <View style={styles.swipeContainer} key={document.id}>
-            <Swipeable
-              renderRightActions={() => renderRightActions(document.id)}
-            >
-              <Pressable
-                style={styles.listItemContainer}
-                onPress={() =>
-                  router.push({
-                    pathname: "/documents/[id]",
-                    params: { id: document.id },
-                  })
-                }
+        {documents.map((document, index) => (
+          <Animated.View
+            key={document.id}
+            entering={BounceInUp.duration(450).delay(index * 25)}
+          >
+            <View style={styles.swipeContainer} key={document.id}>
+              <Swipeable
+                renderRightActions={() => renderRightActions(document.id)}
               >
-                <View style={styles.documentTitleContainer}>
-                  <Text style={styles.listItemTitle}>{document.title}</Text>
-                  <Text style={styles.listItemText}>{document.content}</Text>
-                </View>
-                <View style={styles.memberListContainer}>
-                  <View style={styles.memberList}>
-                    {/* Placeholder */}
-                    {document.members.length < 2 && (
-                      <View style={{ flex: 1 }}></View>
-                    )}
-                    {/* Placeholder */}
-                    {document.members.length < 3 && (
-                      <View style={{ flex: 1 }}></View>
-                    )}
-                    {document.members?.map((member) => (
-                      <View key={member.id} style={styles.member}>
-                        <Text>{member.email.charAt(0).toUpperCase()}</Text>
-                      </View>
-                    ))}
+                <Pressable
+                  style={styles.listItemContainer}
+                  onPress={() =>
+                    router.push({
+                      pathname: "/documents/[id]",
+                      params: { id: document.id },
+                    })
+                  }
+                >
+                  <View style={styles.documentTitleContainer}>
+                    <Text style={styles.listItemTitle}>{document.title}</Text>
+                    <Text style={styles.listItemText}>{document.content}</Text>
                   </View>
-                </View>
-                <View style={styles.arrowContainer}>
+                  <View style={styles.memberListContainer}>
+                    <View style={styles.memberList}>
+                      {/* Placeholder */}
+                      {document.members.length < 2 && (
+                        <View style={{ flex: 1 }}></View>
+                      )}
+                      {/* Placeholder */}
+                      {document.members.length < 3 && (
+                        <View style={{ flex: 1 }}></View>
+                      )}
+                      {document.members?.map((member) => (
+                        <View key={member.id} style={styles.member}>
+                          <Text>{member.email.charAt(0).toUpperCase()}</Text>
+                        </View>
+                      ))}
+                    </View>
+                  </View>
+                  <View style={styles.arrowContainer}>
                     <Ionicons name="chevron-forward" size={24} color="black" />
-                </View>
-              </Pressable>
-            </Swipeable>
-          </View>
+                  </View>
+                </Pressable>
+              </Swipeable>
+            </View>
+          </Animated.View>
         ))}
       </ScrollView>
     </SafeAreaView>
