@@ -11,7 +11,7 @@ import {
   View,
 } from "react-native";
 import Swipeable from "react-native-gesture-handler/ReanimatedSwipeable";
-import Animated, { BounceIn } from "react-native-reanimated";
+import Animated, { BounceInUp } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 import type { Document } from "../../types/documents";
 
@@ -92,7 +92,7 @@ export default function DocumentsScreen() {
         {documents.map((document, index) => (
           <Animated.View
             key={document.id}
-            entering={BounceIn.duration(450).delay(index * 70)}
+            entering={BounceInUp.duration(450).delay(index * 25)}
           >
             <View style={styles.swipeContainer} key={document.id}>
               <Swipeable
